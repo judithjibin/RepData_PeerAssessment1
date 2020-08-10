@@ -2,18 +2,18 @@
 title: "PA1_template"
 author: "Judith"
 date: "10/08/2020"
-output: html_document
+output: 
+    html_document:
+        keep_md : True
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+
 
 ## Loading and preprocessing data
 
 1. Code for reading in the dataset and/or processing the data
 
-```{r activity}
+```r
 activityData <- read.csv("activity.csv")
 ```
 
@@ -21,49 +21,76 @@ activityData <- read.csv("activity.csv")
 
 2. Histogram of the total number of steps taken each day
 
-```{r}
+
+```r
 stepsPerDay <- aggregate(steps ~ date, activityData, sum, na.rm = TRUE)
 hist(stepsPerDay$steps)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-1-1.png)<!-- -->
+
 3. Mean and median number of steps taken each day
 
 Mean of total steps per day
-```{r}
+
+```r
 MeanStepsPerDay <- mean(stepsPerDay$steps)
 MeanStepsPerDay
 ```
+
+```
+## [1] 10766.19
+```
 Meadian of total steps per day
-```{r}
+
+```r
 MedianStepsPerDay <- median(stepsPerDay$steps)
 MedianStepsPerDay
+```
+
+```
+## [1] 10765
 ```
 
 ## What is the average daily activity pattern?
 
 4. Time series plot of the average number of steps taken
-```{r}
+
+```r
 stepsPerInterval <- aggregate(steps ~ interval, activityData, mean, na.rm = TRUE)
 plot(steps ~ interval, stepsPerInterval, type = "l")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)<!-- -->
+
 5. The 5-minute interval that, on average, contains the maximum number of steps
-```{r}
+
+```r
 maxStepsInterval <- stepsPerInterval[which.max(stepsPerInterval$steps),]$interval
 maxStepsInterval
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 6. Code to describe and show a strategy for imputing missing data
 
-```{r}
+
+```r
 missingValues <- sum(is.na(activityData$steps))
 missingValues
 ```
 
+```
+## [1] 2304
+```
+
 Function to imput missing values
 
-```{r}
+
+```r
 ImputMissingValue <- function(interval){
     stepsPerInterval[(stepsPerInterval$interval == interval),]$steps
 }
@@ -71,7 +98,8 @@ ImputMissingValue <- function(interval){
 
 Filling-in missing values
 
-```{r}
+
+```r
 activityDataNoNA <- activityData
 for(i in 1:nrow(activityData)){
     if(is.na(activityData[i,]$steps)){
@@ -82,19 +110,34 @@ for(i in 1:nrow(activityData)){
 
 7.Histogram of the total number of steps taken each day after missing values are imputed
 
-```{r}
+
+```r
 stepsPerDayNoNA <- aggregate(steps ~ date, activityDataNoNA, sum)
 hist(stepsPerDayNoNA$steps)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
 
 Mean and median with missing values filled in
 
-```{r}
+
+```r
 MeanStepsPerDayNoNA <- mean(stepsPerDayNoNA$steps)
 MedianStepsPerDayNoNA <- median(stepsPerDayNoNA$steps)
 MeanStepsPerDayNoNA
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 MedianStepsPerDayNoNA
+```
+
+```
+## [1] 10766.19
 ```
 
 The mean didn’t change after the replacements of NAs, the median increased by about 0.1% of the original value.
@@ -103,7 +146,8 @@ The mean didn’t change after the replacements of NAs, the median increased by 
 
 Create a new factor variable to differentiate between weekdays and weekends
 
-```{r}
+
+```r
 activityDataNoNA$date <-  as.Date(strptime(activityDataNoNA$date, format = "%Y-%m-%d"))
 activityDataNoNA$day <- weekdays(activityDataNoNA$date)
 for(i in 1:nrow(activityDataNoNA)){
@@ -119,10 +163,13 @@ for(i in 1:nrow(activityDataNoNA)){
 
 8.Panel plot comparing the average number of steps taken per 5-minute interval across weekdays and weekends
 
-```{r}
+
+```r
 stepsByDay <- aggregate(steps ~ interval + day, activityDataNoNA, mean)
 
 library(lattice)
 xyplot(steps ~ interval|day, stepsByDay, type = "l", xlab = "Interval", ylab = "No. of steps", layout = c(1,2))
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
